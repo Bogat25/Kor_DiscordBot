@@ -7,7 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Discord_Kor.GameManager;
+using Discord_Kor.GameComponents.GameManager;
+using Discord_Kor.GameComponents.Classes;
+using Amazon.S3.Model;
 
 namespace DiscordKor;
 
@@ -24,15 +26,20 @@ public class Program
     public static bool Isafk { get; set; }
     public static DateTimeOffset LastActivity { get; set; } = DateTimeOffset.UtcNow;
 
+    public static RunningGames activeGames = new RunningGames();
     // Program entry point
     public static Task Main() => MainAsync();
+
+    public static async Task StartGame(RunningGame startedGame)
+    {
+        activeGames.runningGameList.Add(startedGame);
+        await GameManager.GameStarted(activeGames.runningGameList[activeGames.runningGameList.Count - 1]); //átadom az utolsót
+    }
 
     public static async Task MainAsync()
     {
 
         //Game Manager meghívása
-
-        _ = GameManager.MainAsync();
 
 
 
