@@ -12,9 +12,7 @@ namespace Discord_Kor.GameComponents.Classes
     {
         public string gameServerId;
         public string gameChannelId;
-        public string lastMessageType = "";
-        public ulong lastMessageID = 0;
-
+        public MessageInfo message = new MessageInfo();
         public List<Player> players = new List<Player>();
 
 

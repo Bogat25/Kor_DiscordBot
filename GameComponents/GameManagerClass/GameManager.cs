@@ -22,9 +22,7 @@ namespace Discord_Kor.GameComponents.GameManagerClass
         }
         public async Task StartGame()
         {
-
-            gameInfo.lastMessageID = await BotMessages.GameStartedAskToJoin(gameInfo);
-            gameInfo.lastMessageType = "waitForJoin";
+            gameInfo.message = await BotMessages.GameStartedAskToJoin(gameInfo);
 
         }
         public async Task PlayerJoined(Player player)

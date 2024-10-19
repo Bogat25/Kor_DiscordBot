@@ -4,6 +4,7 @@ using Discord_Kor.GameComponents.Classes;
 using DiscordKor;
 using System;
 using System.Reflection;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace Discord_Kor.GameComponents.BotGameMessages
@@ -15,14 +16,14 @@ namespace Discord_Kor.GameComponents.BotGameMessages
         {
         }
 
-        public static async Task<ulong> GameStartedAskToJoin(RunningGame runningGameInfo)
+        public static async Task<MessageInfo> GameStartedAskToJoin(RunningGame runningGameInfo)
         {
             // A szerver (guild) lekérdezése az ID alapján a Program.Client segítségével
             var guild = Program.Client.GetGuild(ulong.Parse(runningGameInfo.gameServerId));
             if (guild == null)
             {
                 Console.WriteLine("Nem található a szerver.");
-                return 0;
+                return null;
             }
 
             // A csatorna lekérdezése az ID alapján
@@ -30,19 +31,20 @@ namespace Discord_Kor.GameComponents.BotGameMessages
             if (channel == null)
             {
                 Console.WriteLine("Nem található a csatorna.");
-                return 0;
+                return null;
             }
 
             // Kiíratási sablon hívása
-            var message = await SendGameStartMessage(channel, runningGameInfo, false); //ha true akkor updateli ha nem true akkor elküldi
-            return message;
+            var messageInfo = await SendGameStartMessage(channel, runningGameInfo, false); // ha true, akkor updateli, ha nem, akkor elküldi
+            return messageInfo;
         }
 
         // Sablon függvény a kiíratáshoz
-        public static async Task<ulong> SendGameStartMessage(ITextChannel channel, RunningGame runningGameInfo, bool trueIfUpdate, ulong? existingMessageId = null)
+        public static async Task<MessageInfo> SendGameStartMessage(ITextChannel channel, RunningGame runningGameInfo, bool trueIfUpdate, ulong? existingMessageId = null)
         {
             // Játékosok neveinek listája
             var playerNames = string.Join("\n", runningGameInfo.players.Select(p => p.name));
+            var messageInfo = new MessageInfo(); // MessageInfo példány létrehozása
 
             if (trueIfUpdate && existingMessageId.HasValue)
             {
@@ -62,23 +64,25 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                     // Meglévő üzenet módosítása
                     await message.ModifyAsync(msg =>
                     {
-                        msg.Content = $"A játék frissítve lett! Csatlakozz {runningGameInfo.players[0].name} által.";
                         msg.Embed = embed;
                     });
 
-                    // Visszaadja a meglévő üzenet azonosítóját
-                    return message.Id;
+                    // MessageInfo feltöltése frissítési adatokkal
+                    messageInfo.lastMessageType = "waitForJoin";
+                    messageInfo.lastMessageID = message.Id;
+                    messageInfo.lastMessageChanel = channel.Id;
+
+                    return messageInfo;
                 }
                 else
                 {
                     Console.WriteLine("Nem található az üzenet a megadott ID-val.");
-                    return 0;
+                    return null;
                 }
             }
             else
             {
                 // Ha nem frissítésről van szó, új üzenetet hoz létre
-                await channel.SendMessageAsync($"A játék elkezdődött! Csatlakozz {runningGameInfo.players[0].name} által.");
 
                 var embed = new EmbedBuilder()
                 {
@@ -92,9 +96,15 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                 var thumbsUpEmoji = new Emoji("👍");
                 await message.AddReactionAsync(thumbsUpEmoji);
 
-                return message.Id;
+                // MessageInfo feltöltése új üzenet adatokkal
+                messageInfo.lastMessageType = "waitForJoin";
+                messageInfo.lastMessageID = message.Id;
+                messageInfo.lastMessageChanel = channel.Id;
+
+                return messageInfo;
             }
         }
+
 
 
 
@@ -108,10 +118,10 @@ namespace Discord_Kor.GameComponents.BotGameMessages
             bool found = false;
             foreach (var gm  in gameManagerek)
             {
-                if (gm.gameInfo.lastMessageID == reaction.MessageId)
+                if (gm.gameInfo.message.lastMessageID == reaction.MessageId)
                 {
                     found = true;
-                    if (gm.gameInfo.lastMessageType == "waitForJoin")
+                    if (gm.gameInfo.message.lastMessageType == "waitForJoin")
                     {
                         if (reaction.Emote.Name == "👍")
                         {
@@ -132,10 +142,10 @@ namespace Discord_Kor.GameComponents.BotGameMessages
             bool found = false;
             foreach (var gm  in gameManagerek)
             {
-                if (gm.gameInfo.lastMessageID == reaction.MessageId)
+                if (gm.gameInfo.message.lastMessageID == reaction.MessageId)
                 {
                     found = true;
-                    if (gm.gameInfo.lastMessageType == "waitForJoin")
+                    if (gm.gameInfo.message.lastMessageType == "waitForJoin")
                     {
                         if (reaction.Emote.Name == "👍")
                         {
@@ -148,9 +158,12 @@ namespace Discord_Kor.GameComponents.BotGameMessages
 
         public static async Task UpdateLastMessage(RunningGame gameInfo)
         {
-            if (gameInfo.lastMessageType == "waitForJoin")
+            if (gameInfo.message.lastMessageType == "waitForJoin")
             {
+                var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
+                var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));
 
+                SendGameStartMessage(channel, gameInfo, true, gameInfo.message.lastMessageID);
             }
         }
     }
