@@ -7,9 +7,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Discord_Kor.GameComponents.GameManager;
+using Discord_Kor.GameComponents.GameManagerClass;
 using Discord_Kor.GameComponents.Classes;
 using Amazon.S3.Model;
+using Discord_Kor.GameComponents.BotGameMessages;
+using Discord_Kor.GameComponents.GameManagerClass;
 
 namespace DiscordKor;
 
@@ -26,20 +28,19 @@ public class Program
     public static bool Isafk { get; set; }
     public static DateTimeOffset LastActivity { get; set; } = DateTimeOffset.UtcNow;
 
-    public static RunningGames activeGames = new RunningGames();
+    public static List<GameManager> activeGames = new List<GameManager>();
     // Program entry point
     public static Task Main() => MainAsync();
 
     public static async Task StartGame(RunningGame startedGame)
     {
-        activeGames.runningGameList.Add(startedGame);
-        await GameManager.GameStarted(activeGames.runningGameList[activeGames.runningGameList.Count - 1]); //átadom az utolsót
+        activeGames.Add(new GameManager(startedGame));
+        await activeGames[activeGames.Count - 1].StartGame();
+        //await activeGames.runningGameList.GameStarted(activeGames.runningGameList[activeGames.runningGameList.Count - 1]); //átadom az utolsót
     }
 
     public static async Task MainAsync()
     {
-
-        //Game Manager meghívása
 
 
 
@@ -55,17 +56,20 @@ public class Program
         services
         // Add the configuration to the registered services
         .AddSingleton(Config)
-        // Add the DiscordSocketClient, along with specifying the GatewayIntents and user caching
-        .AddSingleton(x => new DiscordShardedClient(new DiscordSocketConfig
-        {
-            //GatewayIntents = GatewayIntents.None,
-            //GatewayIntents = GatewayIntents.All,                              ,//
-            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildMessages | GatewayIntents.MessageContent,
-            LogGatewayIntentWarnings = false,
-            AlwaysDownloadUsers = true,
-            LogLevel = IsDebug() ? LogSeverity.Debug : LogSeverity.Info,
-            TotalShards = TotalShards,
-        }))
+// Add the DiscordSocketClient, along with specifying the GatewayIntents and user caching
+.AddSingleton(x => new DiscordShardedClient(new DiscordSocketConfig
+{
+    GatewayIntents = GatewayIntents.Guilds |
+                     GatewayIntents.GuildMembers |
+                     GatewayIntents.GuildMessages |
+                     GatewayIntents.MessageContent |
+                     GatewayIntents.GuildMessageReactions, // Ezt kell hozzáadnod
+    LogGatewayIntentWarnings = false,
+    AlwaysDownloadUsers = true,
+    LogLevel = IsDebug() ? LogSeverity.Debug : LogSeverity.Info,
+    TotalShards = TotalShards,
+}))
+
         // Adding console logging
         .AddTransient<ConsoleLogger>()
         // Used for slash commands and their registration with Discord
@@ -104,30 +108,24 @@ public class Program
         Client = provider.GetRequiredService<DiscordShardedClient>();
         var config = provider.GetRequiredService<IConfigurationRoot>();
 
-
         await provider.GetRequiredService<InteractionHandler>().InitializeAsync();
-        //await provider.GetRequiredService<MessageHandler>().Initialize();
 
-
-        // Subscribe to client log events
         Client.Log += _ => provider.GetRequiredService<ConsoleLogger>().Log(_);
-        // Subscribe to slash command log events
         Commands.Log += _ => provider.GetRequiredService<ConsoleLogger>().Log(_);
-
 
         Client.ShardReady += ShardsReady;
 
-        await Client.SetActivityAsync(new Game("/help"));
 
+        Client.ReactionAdded += BotMessages.ManageReactions; // Reakciók
+
+        await Client.SetActivityAsync(new Game("/help"));
         await OnlineStatus();
         _ = AFKStatus();
-
 
         await Client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("TOKEN"));
 
         int recomenedShards = await Client.GetRecommendedShardCountAsync();
         await ConsoleLogger.Shared.Log(new LogMessage(LogSeverity.Error, "Starting up", $"Recomened shards: {recomenedShards}"));
-
 
         if (Environment.GetEnvironmentVariable("shards") is null)
         {
@@ -139,13 +137,11 @@ public class Program
             }
         }
 
-
         await Client.StartAsync();
-
-
 
         await Task.Delay(-1);
     }
+
     public static async Task ShardsReady(DiscordSocketClient client)
     {
         // If running the bot with DEBUG flag, register all commands to guild specified in config

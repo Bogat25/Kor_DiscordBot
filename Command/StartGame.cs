@@ -1,6 +1,6 @@
 ﻿using Discord.Interactions;
 using Discord_Kor.GameComponents.Classes;
-using Discord_Kor.GameComponents.GameManager;
+using Discord_Kor.GameComponents.GameManagerClass;
 
 namespace DiscordKor;
 
