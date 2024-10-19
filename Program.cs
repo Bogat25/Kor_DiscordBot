@@ -1,18 +1,20 @@
-﻿using Discord.Interactions;
+﻿using Discord;
+using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
+using DiscordKor.Log;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Discord.Commands;
-using Discord;
 using Microsoft.Extensions.Logging;
-using DiscordKor.Log;
+using Discord_Kor.GameManager;
 
 namespace DiscordKor;
 
 public class Program
 {
-    //test
+
+
     private static int TotalShards = int.Parse(Environment.GetEnvironmentVariable("shards") ?? "1");
     private static int LoadedShards = 0;
 
@@ -27,6 +29,13 @@ public class Program
 
     public static async Task MainAsync()
     {
+
+        //Game Manager meghívása
+
+        _ = GameManager.MainAsync();
+
+
+
         Config = new ConfigurationBuilder()
         // this will be used more later on
         .SetBasePath(AppContext.BaseDirectory)
