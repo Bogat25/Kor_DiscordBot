@@ -17,6 +17,6 @@ public class StartGameCommands : InteractionModuleBase<ShardedInteractionContext
 
 
         await RespondAsync(embed: embed.Build());
-        await Program.StartGame(new RunningGame("", "","",""));
+        await Program.StartGame(new RunningGame(Context.User.GlobalName,Context.User.Id.ToString(),Context.Guild.Id.ToString(), Context.Channel.Id.ToString()));
     }
 }
