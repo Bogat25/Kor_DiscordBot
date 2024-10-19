@@ -13,7 +13,7 @@ public class StartGameCommands : InteractionModuleBase<ShardedInteractionContext
     {
         var embed = EmbedTemplates.DefaultEmbed("Help", Context);
 
-        embed.AddField("`/help`", "Some help.");
+        embed.AddField("`Start game`", "Some help.");
 
 
         await RespondAsync(embed: embed.Build());

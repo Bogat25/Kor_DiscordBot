@@ -1,4 +1,6 @@
-﻿using Discord_Kor.GameComponents.Classes;
+﻿using Discord.WebSocket;
+using Discord_Kor.GameComponents.BotGameMessages;
+using Discord_Kor.GameComponents.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +14,19 @@ namespace Discord_Kor.GameComponents.GameManager
     //Console.WriteLine("Game Manager has been Started");
     public class GameManager
     {
-        public static async Task Main(string gameManagerUserToken, string gameManagerUserName, string channelID)
-        {   
-            Console.WriteLine("test");
-        }
+        BotMessages BotMessages = new BotMessages();
+
+        //public static async Task Main(string gameManagerUserToken, string gameManagerUserName, string channelID)
+        //{   
+        //    Console.WriteLine("test");
+        //}
 
         public static async Task GameStarted(RunningGame runningGame)
         {
             Console.WriteLine(runningGame.gameMasterUserName);
+
+            BotMessages.GameStartedAskToJoin(runningGame);
+
 
         }
     }
