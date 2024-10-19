@@ -16,10 +16,6 @@ namespace Discord_Kor.GameComponents.GameManagerClass
     public class GameManager
     {
         public RunningGame gameInfo = new RunningGame();
-
-
-
-
         public GameManager(RunningGame runningGamesList)
         {
             this.gameInfo = runningGamesList;
@@ -31,14 +27,13 @@ namespace Discord_Kor.GameComponents.GameManagerClass
             gameInfo.lastMessageType = "waitForJoin";
 
         }
-
-
         public async Task PlayerJoined(Player player)
         {
             if (player.id != gameInfo.players[0].id)
             {
                 gameInfo.players.Add(player);
             }
+            await BotMessages.UpdateLastMessage(gameInfo);
         }
         public async Task PlayerLeaved(Player player)
         {
@@ -49,11 +44,11 @@ namespace Discord_Kor.GameComponents.GameManagerClass
                     if (item.id == player.id)
                     {
                         var alma = gameInfo.players.Remove(item);
-                        Console.WriteLine();
+                        break;
                     }
                 }
             }
-
+            await BotMessages.UpdateLastMessage(gameInfo);
         }
     }
 }

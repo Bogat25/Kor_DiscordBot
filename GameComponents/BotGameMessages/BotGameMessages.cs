@@ -33,24 +33,71 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                 return 0;
             }
 
-            // Üzenet elküldése a csatornára
-            await channel.SendMessageAsync($"A játék elkezdődött! Csatlakozz {runningGameInfo.players[0].name} által.");
-
-            var embed = new EmbedBuilder()
-            {
-                Title = $"\"{runningGameInfo.players[0].name}\" létrehozott egy gamet.",
-                Description = "Csatlakozz te is.\n\nEddig csatlakoztak:\n\n(később feltöltendő list)\n\nCsatlakozni a reakció megnyomásával tudsz.",
-                Color = Color.Green
-            }.Build();
-
-            // Üzenet elküldése a megadott csatornára
-            var message = await channel.SendMessageAsync(embed: embed);
-
-            // Reakció hozzáadása (például 👍 emoji)
-            var thumbsUpEmoji = new Emoji("👍");
-            await message.AddReactionAsync(thumbsUpEmoji);
-            return message.Id;
+            // Kiíratási sablon hívása
+            var message = await SendGameStartMessage(channel, runningGameInfo, false); //ha true akkor updateli ha nem true akkor elküldi
+            return message;
         }
+
+        // Sablon függvény a kiíratáshoz
+        public static async Task<ulong> SendGameStartMessage(ITextChannel channel, RunningGame runningGameInfo, bool trueIfUpdate, ulong? existingMessageId = null)
+        {
+            // Játékosok neveinek listája
+            var playerNames = string.Join("\n", runningGameInfo.players.Select(p => p.name));
+
+            if (trueIfUpdate && existingMessageId.HasValue)
+            {
+                // Ha a trueIfUpdate true és van meglévő üzenet ID, frissítse az üzenetet
+                var message = await channel.GetMessageAsync(existingMessageId.Value) as IUserMessage;
+
+                if (message != null)
+                {
+                    // Embed frissítése az új adatokkal
+                    var embed = new EmbedBuilder()
+                    {
+                        Title = $"\"{runningGameInfo.players[0].name}\" frissítette a gamet.",
+                        Description = $"Frissítve! Csatlakozz te is.\n\nEddig csatlakoztak:\n\n{playerNames}\n\nCsatlakozni a reakció megnyomásával tudsz.",
+                        Color = Color.Orange // Frissítéshez más szín
+                    }.Build();
+
+                    // Meglévő üzenet módosítása
+                    await message.ModifyAsync(msg =>
+                    {
+                        msg.Content = $"A játék frissítve lett! Csatlakozz {runningGameInfo.players[0].name} által.";
+                        msg.Embed = embed;
+                    });
+
+                    // Visszaadja a meglévő üzenet azonosítóját
+                    return message.Id;
+                }
+                else
+                {
+                    Console.WriteLine("Nem található az üzenet a megadott ID-val.");
+                    return 0;
+                }
+            }
+            else
+            {
+                // Ha nem frissítésről van szó, új üzenetet hoz létre
+                await channel.SendMessageAsync($"A játék elkezdődött! Csatlakozz {runningGameInfo.players[0].name} által.");
+
+                var embed = new EmbedBuilder()
+                {
+                    Title = $"\"{runningGameInfo.players[0].name}\" létrehozott egy gamet.",
+                    Description = $"Csatlakozz te is.\n\nEddig csatlakoztak:\n\n{playerNames}\n\nCsatlakozni a reakció megnyomásával tudsz.",
+                    Color = Color.Green
+                }.Build();
+
+                var message = await channel.SendMessageAsync(embed: embed);
+
+                var thumbsUpEmoji = new Emoji("👍");
+                await message.AddReactionAsync(thumbsUpEmoji);
+
+                return message.Id;
+            }
+        }
+
+
+
         public static async Task ManageReactionsReactionAdded(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
         {
             if (reaction.UserId == 1296986541142577223) //így a bot nem reagál a saját reakcióira
@@ -61,10 +108,10 @@ namespace Discord_Kor.GameComponents.BotGameMessages
             bool found = false;
             foreach (var gm  in gameManagerek)
             {
-                if (gm.lastMessageID == reaction.MessageId)
+                if (gm.gameInfo.lastMessageID == reaction.MessageId)
                 {
                     found = true;
-                    if (gm.lastMessageType == "waitForJoin")
+                    if (gm.gameInfo.lastMessageType == "waitForJoin")
                     {
                         if (reaction.Emote.Name == "👍")
                         {
@@ -95,16 +142,16 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                             await gm.PlayerLeaved(new Player(reaction.UserId.ToString(), reaction.User.ToString()));
                         }
                     }
-
                 }
             }
-
-            Console.WriteLine("test");
         }
 
         public static async Task UpdateLastMessage(RunningGame gameInfo)
         {
+            if (gameInfo.lastMessageType == "waitForJoin")
+            {
 
+            }
         }
     }
 }
