@@ -74,8 +74,6 @@ namespace Discord_Kor.GameComponents.BotGameMessages
 
                 }
             }
-
-            Console.WriteLine("test");
         }
         public static async Task ManageReactionsReactionRemoved(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
         {
@@ -87,10 +85,10 @@ namespace Discord_Kor.GameComponents.BotGameMessages
             bool found = false;
             foreach (var gm  in gameManagerek)
             {
-                if (gm.lastMessageID == reaction.MessageId)
+                if (gm.gameInfo.lastMessageID == reaction.MessageId)
                 {
                     found = true;
-                    if (gm.lastMessageType == "waitForJoin")
+                    if (gm.gameInfo.lastMessageType == "waitForJoin")
                     {
                         if (reaction.Emote.Name == "👍")
                         {
@@ -102,6 +100,11 @@ namespace Discord_Kor.GameComponents.BotGameMessages
             }
 
             Console.WriteLine("test");
+        }
+
+        public static async Task UpdateLastMessage(RunningGame gameInfo)
+        {
+
         }
     }
 }

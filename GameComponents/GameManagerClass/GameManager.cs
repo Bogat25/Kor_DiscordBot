@@ -16,8 +16,7 @@ namespace Discord_Kor.GameComponents.GameManagerClass
     public class GameManager
     {
         public RunningGame gameInfo = new RunningGame();
-        public string lastMessageType = "";
-        public ulong lastMessageID = 0;
+
 
 
 
@@ -28,8 +27,8 @@ namespace Discord_Kor.GameComponents.GameManagerClass
         public async Task StartGame()
         {
 
-            lastMessageID = await BotMessages.GameStartedAskToJoin(gameInfo);
-            lastMessageType = "waitForJoin";
+            gameInfo.lastMessageID = await BotMessages.GameStartedAskToJoin(gameInfo);
+            gameInfo.lastMessageType = "waitForJoin";
 
         }
 
