@@ -23,10 +23,10 @@ namespace Discord_Kor.GameComponents.GameManager
 
         public static async Task GameStarted(RunningGame runningGame)
         {
-            Console.WriteLine(runningGame.gameMasterUserName);
+            Console.WriteLine(runningGame.players[0].id);
 
             BotMessages.GameStartedAskToJoin(runningGame);
-
+            Console.WriteLine("");
 
         }
     }

@@ -9,22 +9,20 @@ namespace Discord_Kor.GameComponents.Classes
 {
    public class RunningGame
     {
-        public string gameMasterUserName;
-        public string gameMasterDiscordID;
         public string gameServerId;
         public string gameChannelId;
+        public List<Player> players = new List<Player>();
 
 
         public RunningGame()
         {
         }
 
-        public RunningGame(string gameMasterUserName, string gameMasterDiscordID, string gameServerId, string gameChannelId)
+        public RunningGame(Player gameMaster, string gameServerId, string gameChannelId)
         {
-            this.gameMasterUserName = gameMasterUserName;
-            this.gameMasterDiscordID = gameMasterDiscordID;
             this.gameServerId = gameServerId;
             this.gameChannelId = gameChannelId;
+            players.Add(gameMaster);
         }
     }
 }

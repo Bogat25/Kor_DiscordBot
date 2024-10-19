@@ -27,12 +27,12 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                 return;
             }
             // Üzenet elküldése a csatornára
-            await channel.SendMessageAsync($"A játék elkezdődött! Csatlakozz {runningGameInfo.gameMasterUserName} által.");
+            await channel.SendMessageAsync($"A játék elkezdődött! Csatlakozz {runningGameInfo.players[0].name} által.");
 
 
             var embed = new EmbedBuilder()
             {
-                Title = $"\"{runningGameInfo.gameMasterUserName}\" létrehozott egy gamet.",
+                Title = $"\"{runningGameInfo.players[0].name}\" létrehozott egy gamet.",
                 Description = "Csatlakozz te is.\n\nEddig csatlakoztak:\n\n(később feltöltendő list)\n\nCsatlakozni a reakció megnyomásával tudsz.",
                 Color = Color.Green
             }.Build();

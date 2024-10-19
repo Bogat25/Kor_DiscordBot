@@ -13,7 +13,7 @@ namespace Discord_Kor.GameComponents.Classes
 
         public void StartGame(string gameMasterUserName, string gameMasterDiscordID, string gameServerId, string gameChannelId)
         {
-            runningGameList.Add(new RunningGame(gameMasterUserName, gameMasterDiscordID, gameServerId, gameChannelId));
+            runningGameList.Add(new RunningGame(new Player(gameMasterDiscordID, gameMasterUserName), gameServerId, gameChannelId));
         }
 
             //GameManager.GameStarted(gameMasterUserName, gameMasterDiscordID, gameChannelId);
