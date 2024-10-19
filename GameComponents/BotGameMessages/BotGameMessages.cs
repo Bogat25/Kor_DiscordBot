@@ -51,15 +51,56 @@ namespace Discord_Kor.GameComponents.BotGameMessages
             await message.AddReactionAsync(thumbsUpEmoji);
             return message.Id;
         }
-
-        public static async Task ReactionAdded(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
+        public static async Task ManageReactionsReactionAdded(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
         {
+            if (reaction.UserId == 1296986541142577223) //így a bot nem reagál a saját reakcióira
+            {
+                return;
+            }
+            List<GameManagerClass.GameManager> gameManagerek = Program.activeGames;
+            bool found = false;
+            foreach (var gm  in gameManagerek)
+            {
+                if (gm.lastMessageID == reaction.MessageId)
+                {
+                    found = true;
+                    if (gm.lastMessageType == "waitForJoin")
+                    {
+                        if (reaction.Emote.Name == "👍")
+                        {
+                            await gm.PlayerJoined(new Player(reaction.UserId.ToString(), reaction.User.ToString()));
+                        }
+                    }
+
+                }
+            }
+
             Console.WriteLine("test");
         }
-
-
-        public static async Task ManageReactions(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
+        public static async Task ManageReactionsReactionRemoved(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
         {
+            if (reaction.UserId == 1296986541142577223) //így a bot nem reagál a saját reakcióira
+            {
+                return;
+            }
+            List<GameManagerClass.GameManager> gameManagerek = Program.activeGames;
+            bool found = false;
+            foreach (var gm  in gameManagerek)
+            {
+                if (gm.lastMessageID == reaction.MessageId)
+                {
+                    found = true;
+                    if (gm.lastMessageType == "waitForJoin")
+                    {
+                        if (reaction.Emote.Name == "👍")
+                        {
+                            await gm.PlayerLeaved(new Player(reaction.UserId.ToString(), reaction.User.ToString()));
+                        }
+                    }
+
+                }
+            }
+
             Console.WriteLine("test");
         }
     }

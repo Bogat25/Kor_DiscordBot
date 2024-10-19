@@ -116,7 +116,8 @@ public class Program
         Client.ShardReady += ShardsReady;
 
 
-        Client.ReactionAdded += BotMessages.ManageReactions; // Reakciók
+        Client.ReactionAdded += BotMessages.ManageReactionsReactionAdded; // Reakciók
+        Client.ReactionRemoved += BotMessages.ManageReactionsReactionRemoved; // Reakciók
 
         await Client.SetActivityAsync(new Game("/help"));
         await OnlineStatus();
