@@ -63,7 +63,9 @@ public class Program
                      GatewayIntents.GuildMembers |
                      GatewayIntents.GuildMessages |
                      GatewayIntents.MessageContent |
-                     GatewayIntents.GuildMessageReactions, // Ezt kell hozzáadnod
+                     GatewayIntents.GuildMessageReactions| // Ezt kell hozzáadnod
+                     GatewayIntents.DirectMessages |                 // Ezt hozzá kell adni
+                     GatewayIntents.DirectMessageReactions,
     LogGatewayIntentWarnings = false,
     AlwaysDownloadUsers = true,
     LogLevel = IsDebug() ? LogSeverity.Debug : LogSeverity.Info,
@@ -115,8 +117,8 @@ public class Program
 
         Client.ShardReady += ShardsReady;
 
-        Client.ReactionAdded += PlayerReactions.ManageReactionsReactionAdded; //reakciók kezelése
-        Client.ReactionRemoved += PlayerReactions.ManageReactionsReactionRemoved;
+        Client.ReactionAdded += PlayerReactions.ManageReactionsReactionAdded_Server; //reakciók kezelése
+        Client.ReactionRemoved += PlayerReactions.ManageReactionsReactionRemoved_Server;
 
         await Client.SetActivityAsync(new Game("/help"));
         await OnlineStatus();

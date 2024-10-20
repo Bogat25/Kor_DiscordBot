@@ -13,8 +13,12 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
     public class PlayerReactions
     {
 
-        public static async Task ManageReactionsReactionAdded(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
+        public static async Task ManageReactionsReactionAdded_Server(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
         {
+            if (reaction.Channel is null) //kiszuri a privat üzeneteket
+            {
+                return;
+            }
             if (reaction.UserId == 1296986541142577223) //így a bot nem reagál a saját reakcióira
             {
                 return;
@@ -62,7 +66,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
                 }
             }
         }
-        public static async Task ManageReactionsReactionRemoved(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
+        public static async Task ManageReactionsReactionRemoved_Server(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
         {
             if (reaction.UserId == 1296986541142577223) //így a bot nem reagál a saját reakcióira
             {

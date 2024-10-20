@@ -1,6 +1,7 @@
 ﻿using Amazon.S3.Model;
 using Discord;
 using Discord.WebSocket;
+using Discord_Kor.GameComponents.BotGameMessages.PersonMessages;
 using Discord_Kor.GameComponents.BotGameMessages.ServerMessages;
 using Discord_Kor.GameComponents.Classes;
 using System;
@@ -59,7 +60,10 @@ namespace Discord_Kor.GameComponents.GameManagerClass
             await BotMessages.SendPlayersDataSheet(gameInfo);
 
 
-            await BotMessages.SendCurrentGameState(gameInfo);
+            await VoteSystem.AskPeopleToVote(gameInfo);
+            Console.WriteLine("test");
+
+            
         }
     }
 }

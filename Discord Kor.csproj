@@ -29,7 +29,4 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="GameComponents\BotGameMessages\PersonMessages\" />
-  </ItemGroup>
 </Project>
