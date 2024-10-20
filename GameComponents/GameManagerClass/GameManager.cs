@@ -57,10 +57,9 @@ namespace Discord_Kor.GameComponents.GameManagerClass
                 player.CreatePersonality();
             }
             await BotMessages.SendPlayersDataSheet(gameInfo);
-            
-            var alma = gameInfo.players.Count();
-            Console.WriteLine("test");
-            Console.WriteLine("");
+
+
+            await BotMessages.SendCurrentGameState(gameInfo);
         }
     }
 }

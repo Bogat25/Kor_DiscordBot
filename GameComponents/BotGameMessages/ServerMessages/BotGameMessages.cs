@@ -5,6 +5,7 @@ using Discord_Kor.GameComponents.GameManagerClass;
 using DiscordKor;
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -142,6 +143,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
                 .WithDescription($"A játékmester: **{gameInfo.players.First().Name}**")
                 .WithColor(Color.Green);
 
+            // Játékosok listájának összeállítása
             StringBuilder playersList = new StringBuilder();
             foreach (var player in gameInfo.players)
             {
@@ -150,15 +152,17 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
 
             embedBuilder.AddField("Játékosok:", playersList.ToString(), false);
 
-            embedBuilder.AddField("Játék Beállítások", $"Max Játékosok: {gameInfo.settings.MaxPlayers}\n" +
-                                                        $"Min Játékosok: {gameInfo.settings.MinPlayers}\n" +
-                                                        $"Szavazási idő (másodperc): {gameInfo.settings.VoteTime}\n" +
-                                                        $"Vita időtartam (másodperc): {gameInfo.settings.DiscussionTime}", false);
+            // A GameSettings osztály ToString() metódusának használata a beállításokhoz
+            embedBuilder.AddField("Játék Beállítások", gameInfo.settings.ToString(), false);
 
+            // Megkeressük a Discord guildet és a csatornát
             var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
             var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));
+
+            // Üzenet küldése
             await channel.SendMessageAsync(embed: embedBuilder.Build());
         }
+
         public static async Task SendPlayersDataSheet(RunningGame runningGame)
         {
             // Megkeressük a Discord guildet és a csatornát
@@ -179,6 +183,51 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
             }
         }
 
-    }
 
-}
+            public static async Task SendCurrentGameState(RunningGame runningGame)
+            {
+                var embedBuilder = new EmbedBuilder()
+                    .WithTitle("🛑 Aktuális Játék Állapot")
+                    .WithColor(Color.DarkBlue); // Sötétkék szín a kiemeléshez
+
+                // Élő játékosok listája
+                StringBuilder livePlayersList = new StringBuilder();
+                StringBuilder eliminatedPlayersList = new StringBuilder();
+
+                int playerIndex = 1; // Játékosok sorszáma
+
+                // Végigmegyünk a játékosokon és összeállítjuk az élő és kiesett játékosok listáját
+                foreach (var player in runningGame.players)
+                {
+                    if (player.IsAlive)
+                    {
+                        // Élő játékosok félkövér stílusban és sorszámozva, nincs extra sor
+                        livePlayersList.Append($"**{playerIndex}. {player.Name}**\n");
+                    }
+                    else
+                    {
+                        // Kiesett játékosok áthúzott stílusban és sorszámozva, nincs extra sor
+                        eliminatedPlayersList.Append($"~~{playerIndex}. {player.Name}~~\n");
+                    }
+                    playerIndex++;
+                }
+
+                // Élő játékosok hozzáadása az embedhez
+                embedBuilder.AddField("✅ Élő Játékosok:", livePlayersList.Length > 0 ? livePlayersList.ToString() : "Nincsenek élő játékosok", false);
+
+                // Kiesett játékosok hozzáadása az embedhez
+                embedBuilder.AddField("💀 Kiesett Játékosok:", eliminatedPlayersList.Length > 0 ? eliminatedPlayersList.ToString() : "Nincsenek kiesett játékosok", false);
+
+                // Megkeressük a Discord guildet és a csatornát
+                var guild = Program.Client.GetGuild(ulong.Parse(runningGame.gameServerId));
+                var channel = guild.GetTextChannel(ulong.Parse(runningGame.gameChannelId));
+
+                // Üzenet küldése
+                await channel.SendMessageAsync(embed: embedBuilder.Build());
+            }
+
+
+
+        }
+
+    }
