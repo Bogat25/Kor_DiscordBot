@@ -59,7 +59,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
                         msg.Embed = embed;
                     });
 
-                    messageInfo.lastMessageType = "waitForJoin";
+                    messageInfo.currentGameState = "waitForJoin";
                     messageInfo.lastMessageID = message.Id;
                     messageInfo.lastMessageChanel = channel.Id;
 
@@ -88,7 +88,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
 
 
                 // MessageInfo feltöltése új üzenet adatokkal
-                messageInfo.lastMessageType = "waitForJoin";
+                messageInfo.currentGameState = "waitForJoin";
                 messageInfo.lastMessageID = message.Id;
                 messageInfo.lastMessageChanel = channel.Id;
 
@@ -128,7 +128,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
 
         public static async Task UpdateLastMessage(RunningGame gameInfo)
         {
-            if (gameInfo.message.lastMessageType == "waitForJoin")
+            if (gameInfo.message.currentGameState == "waitForJoin")
             {
                 var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
                 var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));

@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Kor.GameComponents.Classes
 {
-    public class MessageInfo
+    public class VoteAsksInRound
     {
-        public string currentGameState = ""; //running
-        public ulong lastMessageID = 0;
-        public ulong lastMessageChanel = 0;
+        public string VoterId;
+        public string MessageId;
     }
 }

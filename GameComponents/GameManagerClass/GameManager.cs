@@ -61,9 +61,6 @@ namespace Discord_Kor.GameComponents.GameManagerClass
 
 
             await VoteSystem.AskPeopleToVote(gameInfo);
-            Console.WriteLine("test");
-
-            
         }
     }
 }

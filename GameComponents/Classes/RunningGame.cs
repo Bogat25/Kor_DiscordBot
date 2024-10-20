@@ -15,7 +15,7 @@ namespace Discord_Kor.GameComponents.Classes
         public MessageInfo message = new MessageInfo();
         public List<Player> players = new List<Player>();
         public GameSettings settings = new GameSettings();
-
+        public List<VoteAsksInRound >voteAsks = new List<VoteAsksInRound>();
         public RunningGame()
         {
         }

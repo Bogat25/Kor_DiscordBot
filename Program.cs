@@ -11,7 +11,7 @@ using Discord_Kor.GameComponents.GameManagerClass;
 using Discord_Kor.GameComponents.Classes;
 using Amazon.S3.Model;
 using Discord_Kor.GameComponents.GameManagerClass;
-using Discord_Kor.GameComponents.BotGameMessages.ServerMessages;
+using Discord_Kor.GameComponents.BotGameMessages;
 
 namespace DiscordKor;
 
@@ -117,8 +117,8 @@ public class Program
 
         Client.ShardReady += ShardsReady;
 
-        Client.ReactionAdded += PlayerReactions.ManageReactionsReactionAdded_Server; //reakciók kezelése
-        Client.ReactionRemoved += PlayerReactions.ManageReactionsReactionRemoved_Server;
+        Client.ReactionAdded += PlayerReactions.ManageReactionsReactionAddedServer; //reakciók kezelése
+        Client.ReactionRemoved += PlayerReactions.ManageReactionsReactionRemovedServer;
 
         await Client.SetActivityAsync(new Game("/help"));
         await OnlineStatus();
