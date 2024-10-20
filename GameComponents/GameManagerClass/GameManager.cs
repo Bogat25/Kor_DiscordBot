@@ -28,7 +28,7 @@ namespace Discord_Kor.GameComponents.GameManagerClass
         }
         public async Task PlayerJoined(Player player)
         {
-            if (player.id != gameInfo.players[0].id)
+            if (player.Id != gameInfo.players[0].Id)
             {
                 gameInfo.players.Add(player);
             }
@@ -36,11 +36,11 @@ namespace Discord_Kor.GameComponents.GameManagerClass
         }
         public async Task PlayerLeaved(Player player)
         {
-            if (player.id != gameInfo.players[0].id)
+            if (player.Id != gameInfo.players[0].Id)
             {
                 foreach (var item in gameInfo.players)
                 {
-                    if (item.id == player.id)
+                    if (item.Id == player.Id)
                     {
                         var alma = gameInfo.players.Remove(item);
                         break;
@@ -52,6 +52,12 @@ namespace Discord_Kor.GameComponents.GameManagerClass
 
         public async Task GameStarted()
         {
+            foreach (var player in gameInfo.players)
+            {
+                player.CreatePersonality();
+            }
+            await BotMessages.SendPlayersDataSheet(gameInfo);
+            
             var alma = gameInfo.players.Count();
             Console.WriteLine("test");
             Console.WriteLine("");

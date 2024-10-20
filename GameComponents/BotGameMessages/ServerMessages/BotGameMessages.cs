@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord_Kor.GameComponents.Classes;
+using Discord_Kor.GameComponents.GameManagerClass;
 using DiscordKor;
 using System;
 using System.Reflection;
@@ -37,7 +38,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
         public static async Task<MessageInfo> SendGameStartMessage(ITextChannel channel, RunningGame runningGameInfo, bool trueIfUpdate, ulong? existingMessageId = null)
         {
             // Játékosok neveinek listája
-            var playerNames = string.Join("\n", runningGameInfo.players.Select(p => p.name));
+            var playerNames = string.Join("\n", runningGameInfo.players.Select(p => p.Name));
             var messageInfo = new MessageInfo();
 
             if (trueIfUpdate && existingMessageId.HasValue)
@@ -48,7 +49,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
                 {
                     var embed = new EmbedBuilder()
                     {
-                        Title = $"\"{runningGameInfo.players[0].name}\" frissítette a gamet.",
+                        Title = $"\"{runningGameInfo.players[0].Name}\" frissítette a gamet.",
                         Description = $"Frissítve! Csatlakozz te is.\n\nEddig csatlakoztak:\n\n{playerNames}\n\nCsatlakozni a reakció megnyomásával tudsz.",
                         Color = Color.Orange
                     }.Build();
@@ -73,7 +74,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
             {
                 var embed = new EmbedBuilder()
                 {
-                    Title = $"\"{runningGameInfo.players[0].name}\" létrehozott egy gamet.",
+                    Title = $"\"{runningGameInfo.players[0].Name}\" létrehozott egy gamet.",
                     Description = $"Csatlakozz te is.\n\nEddig csatlakoztak:\n\n{playerNames}\n\nCsatlakozni a reakció megnyomásával tudsz.",
                     Color = Color.Green
                 }.Build();
@@ -136,33 +137,47 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
         }
         public static async Task GameStartedSuccesfully(RunningGame gameInfo)
         {
-            // Embed létrehozása, játék indítási információk megjelenítése
             var embedBuilder = new EmbedBuilder()
                 .WithTitle("Játék sikeresen elindult!")
-                .WithDescription($"A játékmester: **{gameInfo.players.First().name}**")
+                .WithDescription($"A játékmester: **{gameInfo.players.First().Name}**")
                 .WithColor(Color.Green);
 
-            // Játékosok listájának összeállítása
             StringBuilder playersList = new StringBuilder();
             foreach (var player in gameInfo.players)
             {
-                playersList.AppendLine(player.name);
+                playersList.AppendLine(player.Name);
             }
 
             embedBuilder.AddField("Játékosok:", playersList.ToString(), false);
 
-            // Játék beállítások (settings) hozzáadása
             embedBuilder.AddField("Játék Beállítások", $"Max Játékosok: {gameInfo.settings.MaxPlayers}\n" +
                                                         $"Min Játékosok: {gameInfo.settings.MinPlayers}\n" +
                                                         $"Szavazási idő (másodperc): {gameInfo.settings.VoteTime}\n" +
                                                         $"Vita időtartam (másodperc): {gameInfo.settings.DiscussionTime}", false);
 
-            // Küldjük az üzenetet a csatornába
             var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
             var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));
             await channel.SendMessageAsync(embed: embedBuilder.Build());
         }
+        public static async Task SendPlayersDataSheet(RunningGame runningGame)
+        {
+            // Megkeressük a Discord guildet és a csatornát
+            var guild = Program.Client.GetGuild(ulong.Parse(runningGame.gameServerId));
+            var channel = guild.GetTextChannel(ulong.Parse(runningGame.gameChannelId));
 
+            // Végigmegyünk az összes játékoson és elküldjük a ToString() alapján az adataikat
+            foreach (var player in runningGame.players)
+            {
+                // Embed létrehozása minden egyes játékos számára
+                var embedBuilder = new EmbedBuilder()
+                    .WithTitle($"Játékos Adatlap - {player.Name}")
+                    .WithDescription(player.ToString())
+                    .WithColor(Color.Blue);
+
+                // Üzenet küldése a csatornára
+                await channel.SendMessageAsync(embed: embedBuilder.Build());
+            }
+        }
 
     }
 

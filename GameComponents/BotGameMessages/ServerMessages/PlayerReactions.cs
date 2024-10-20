@@ -37,7 +37,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
 
                             foreach (var game in Program.activeGames)
                             {
-                                if (reaction.UserId.ToString() == game.gameInfo.players[0].id && game.gameInfo.message.lastMessageID == reaction.MessageId)
+                                if (reaction.UserId.ToString() == game.gameInfo.players[0].Id && game.gameInfo.message.lastMessageID == reaction.MessageId)
                                 {
                                     await BotMessages.RemoveMessage(game.gameInfo); //kitörlöm az üzenetet
                                     Program.activeGames.Remove(game);
@@ -47,7 +47,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
                         }
                         else if (reaction.Emote.Name == ReactionTypes.startEmoji.Name)
                         {
-                            if (reaction.UserId.ToString() == gm.gameInfo.players[0].id)
+                            if (reaction.UserId.ToString() == gm.gameInfo.players[0].Id)
                             {
                                 if (gm.gameInfo.players.Count >= gm.gameInfo.settings.MinPlayers)
                                 {
