@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-namespace Discord_Kor.GameComponents.BotGameMessages
+namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
 {
     public class BotMessages
     {
@@ -50,7 +50,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                     {
                         Title = $"\"{runningGameInfo.players[0].name}\" frissítette a gamet.",
                         Description = $"Frissítve! Csatlakozz te is.\n\nEddig csatlakoztak:\n\n{playerNames}\n\nCsatlakozni a reakció megnyomásával tudsz.",
-                        Color = Color.Orange 
+                        Color = Color.Orange
                     }.Build();
                     await message.ModifyAsync(msg =>
                     {

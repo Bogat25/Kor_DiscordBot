@@ -10,8 +10,8 @@ using Microsoft.Extensions.Logging;
 using Discord_Kor.GameComponents.GameManagerClass;
 using Discord_Kor.GameComponents.Classes;
 using Amazon.S3.Model;
-using Discord_Kor.GameComponents.BotGameMessages;
 using Discord_Kor.GameComponents.GameManagerClass;
+using Discord_Kor.GameComponents.BotGameMessages.ServerMessages;
 
 namespace DiscordKor;
 

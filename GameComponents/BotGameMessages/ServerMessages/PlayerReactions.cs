@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Kor.GameComponents.BotGameMessages
+namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
 {
     public class PlayerReactions
     {
@@ -47,9 +47,15 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                         }
                         else if (reaction.Emote.Name == ReactionTypes.startEmoji.Name)
                         {
-                            if (gm.gameInfo.players.Count >= gm.gameInfo.settings.MinPlayers)
+                            if (reaction.UserId.ToString() == gm.gameInfo.players[0].id)
                             {
-                                await BotMessages.GameStartedSuccesfully(gm.gameInfo);
+                                if (gm.gameInfo.players.Count >= gm.gameInfo.settings.MinPlayers)
+                                {
+                                    await BotMessages.GameStartedSuccesfully(gm.gameInfo);
+
+                                gm.gameInfo.message.lastMessageType = "runningGame";
+                                await gm.GameStarted();
+                                }
                             }
                         }
                     }
