@@ -62,17 +62,19 @@ namespace Discord_Kor.GameComponents.GameManagerClass
             }
             // Játékos adatok elküldése
             await BotMessages.SendPlayersDataSheet(gameInfo);
+            await BotMessages.SendCurrentGameState(gameInfo);
+            await VoteCircle();
 
             // Szavazás kérése minden játékostól
-            await VoteSystem.AskPeopleToVote(gameInfo);
-
-            // Várakozás, amíg minden játékos szavaz
-            await WaitForAllVotes(gameInfo);
-
-            Console.WriteLine("");
-            //Console.WriteLine("Minden játékos szavazott, a játék folytatódhat.");
         }
 
+        public async Task VoteCircle()
+        {
+            await VoteSystem.AskPeopleToVote(gameInfo);
+            // Várakozás, amíg minden játékos szavaz
+            await WaitForAllVotes(gameInfo);
+            Console.WriteLine("Elso szavazas megtortent");
+        }
         public async Task WaitForGameStart(RunningGame gameInfo)
         {
             bool gameStarted = false;
@@ -83,7 +85,7 @@ namespace Discord_Kor.GameComponents.GameManagerClass
                 {
                     return;
                 }
-                await Task.Delay(1000); // 1 másodpercet várunk, majd újra ellenőrizzük
+                await Task.Delay(1000);
             }
         }
 
@@ -99,7 +101,7 @@ namespace Discord_Kor.GameComponents.GameManagerClass
                 // Ha még nem szavazott mindenki, várunk egy kicsit
                 if (!allPlayersVoted)
                 {
-                    await Task.Delay(5000); // 5 másodpercet várunk, majd újra ellenőrizzük
+                    await Task.Delay(1000);
                 }
             }
         }
