@@ -32,8 +32,27 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                         {
                             await gm.PlayerJoined(new Player(reaction.UserId.ToString(), reaction.User.ToString()));
                         }
-                    }
+                        else if (reaction.Emote.Name == ReactionTypes.xEmoji.Name)
+                        {
 
+                            foreach (var game in Program.activeGames)
+                            {
+                                if (reaction.UserId.ToString() == game.gameInfo.players[0].id && game.gameInfo.message.lastMessageID == reaction.MessageId)
+                                {
+                                    await BotMessages.RemoveMessage(game.gameInfo); //kitörlöm az üzenetet
+                                    Program.activeGames.Remove(game);
+                                    break;
+                                }
+                            }
+                        }
+                        else if (reaction.Emote.Name == ReactionTypes.startEmoji.Name)
+                        {
+                            if (gm.gameInfo.players.Count >= gm.gameInfo.settings.MinPlayers)
+                            {
+                                await BotMessages.GameStartedSuccesfully(gm.gameInfo);
+                            }
+                        }
+                    }
                 }
             }
         }

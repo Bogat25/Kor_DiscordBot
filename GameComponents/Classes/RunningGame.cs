@@ -14,7 +14,7 @@ namespace Discord_Kor.GameComponents.Classes
         public string gameChannelId;
         public MessageInfo message = new MessageInfo();
         public List<Player> players = new List<Player>();
-
+        public GameSettings settings = new GameSettings();
 
         public RunningGame()
         {

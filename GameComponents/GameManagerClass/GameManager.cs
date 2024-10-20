@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Amazon.S3.Model;
+using Discord;
 using Discord.WebSocket;
 using Discord_Kor.GameComponents.BotGameMessages;
 using Discord_Kor.GameComponents.Classes;

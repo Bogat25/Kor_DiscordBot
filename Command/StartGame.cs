@@ -1,9 +1,6 @@
 ﻿using Discord.Interactions;
 using Discord_Kor.GameComponents.Classes;
-using Discord_Kor.GameComponents.GameManagerClass;
-
-namespace DiscordKor;
-
+using DiscordKor;
 
 public class StartGameCommands : InteractionModuleBase<ShardedInteractionContext>
 {
@@ -11,12 +8,10 @@ public class StartGameCommands : InteractionModuleBase<ShardedInteractionContext
     [SlashCommand("startgame", "Start The Game")]
     public async Task StartGame()
     {
-        var embed = EmbedTemplates.DefaultEmbed("Help", Context);
+        // Küldünk egy rejtett választ (ephemeral), ami csak a felhasználó lát.
+        await RespondAsync("A játék indítása folyamatban van...", ephemeral: true);
 
-        embed.AddField("`Start game`", "Some help.");
-
-
-        await RespondAsync(embed: embed.Build());
-        await Program.StartGame(new RunningGame(new Player(Context.User.Id.ToString(), Context.User.GlobalName),Context.Guild.Id.ToString(), Context.Channel.Id.ToString()));
+        // Majd elindítjuk a játékot a háttérben
+        await Program.StartGame(new RunningGame(new Player(Context.User.Id.ToString(), Context.User.GlobalName), Context.Guild.Id.ToString(), Context.Channel.Id.ToString()));
     }
 }

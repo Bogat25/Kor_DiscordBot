@@ -4,6 +4,7 @@ using Discord_Kor.GameComponents.Classes;
 using DiscordKor;
 using System;
 using System.Reflection;
+using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
@@ -80,6 +81,8 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                 var message = await channel.SendMessageAsync(embed: embed);
 
                 await message.AddReactionAsync(ReactionTypes.greenCheckEmoji);
+                await message.AddReactionAsync(ReactionTypes.startEmoji);
+                await message.AddReactionAsync(ReactionTypes.xEmoji);
 
 
                 // MessageInfo feltöltése új üzenet adatokkal
@@ -90,6 +93,35 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                 return messageInfo;
             }
         }
+        public static async Task RemoveMessage(RunningGame gameInfo)
+        {
+            // Szerver (guild) megszerzése
+            var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
+            if (guild == null)
+            {
+                Console.WriteLine("No server found for the message to delete");
+                return;
+            }
+
+            // Csatorna megszerzése
+            var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));
+            if (channel == null)
+            {
+                Console.WriteLine("No channel found for the message to delete");
+                return;
+            }
+
+            // Üzenet megszerzése és törlése
+            var message = await channel.GetMessageAsync(gameInfo.message.lastMessageID) as IUserMessage;
+            if (message == null)
+            {
+                Console.WriteLine("No message found to delete");
+                return;
+            }
+
+            await message.DeleteAsync(); // Üzenet törlése
+        }
+
 
 
         public static async Task UpdateLastMessage(RunningGame gameInfo)
@@ -102,5 +134,36 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                 SendGameStartMessage(channel, gameInfo, true, gameInfo.message.lastMessageID);
             }
         }
+        public static async Task GameStartedSuccesfully(RunningGame gameInfo)
+        {
+            // Embed létrehozása, játék indítási információk megjelenítése
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle("Játék sikeresen elindult!")
+                .WithDescription($"A játékmester: **{gameInfo.players.First().name}**")
+                .WithColor(Color.Green);
+
+            // Játékosok listájának összeállítása
+            StringBuilder playersList = new StringBuilder();
+            foreach (var player in gameInfo.players)
+            {
+                playersList.AppendLine(player.name);
+            }
+
+            embedBuilder.AddField("Játékosok:", playersList.ToString(), false);
+
+            // Játék beállítások (settings) hozzáadása
+            embedBuilder.AddField("Játék Beállítások", $"Max Játékosok: {gameInfo.settings.MaxPlayers}\n" +
+                                                        $"Min Játékosok: {gameInfo.settings.MinPlayers}\n" +
+                                                        $"Szavazási idő (másodperc): {gameInfo.settings.VoteTime}\n" +
+                                                        $"Vita időtartam (másodperc): {gameInfo.settings.DiscussionTime}", false);
+
+            // Küldjük az üzenetet a csatornába
+            var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
+            var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));
+            await channel.SendMessageAsync(embed: embedBuilder.Build());
+        }
+
+
     }
+
 }
