@@ -25,6 +25,8 @@ namespace Discord_Kor.GameComponents.GameManagerClass
         public async Task StartGame()
         {
             gameInfo.message = await BotMessages.GameStartedAskToJoin(gameInfo);
+            await WaitForGameStart(gameInfo);
+            await GameStarted();
 
         }
         public async Task PlayerJoined(Player player)
@@ -53,14 +55,54 @@ namespace Discord_Kor.GameComponents.GameManagerClass
 
         public async Task GameStarted()
         {
+            // Játékosok személyiségének létrehozása
             foreach (var player in gameInfo.players)
             {
                 player.CreatePersonality();
             }
+            // Játékos adatok elküldése
             await BotMessages.SendPlayersDataSheet(gameInfo);
 
-
+            // Szavazás kérése minden játékostól
             await VoteSystem.AskPeopleToVote(gameInfo);
+
+            // Várakozás, amíg minden játékos szavaz
+            await WaitForAllVotes(gameInfo);
+
+            Console.WriteLine("");
+            //Console.WriteLine("Minden játékos szavazott, a játék folytatódhat.");
         }
+
+        public async Task WaitForGameStart(RunningGame gameInfo)
+        {
+            bool gameStarted = false;
+
+            while (!gameStarted)
+            {
+                if (gameInfo.message.currentGameState == "running")
+                {
+                    return;
+                }
+                await Task.Delay(1000); // 1 másodpercet várunk, majd újra ellenőrizzük
+            }
+        }
+
+        public async Task WaitForAllVotes(RunningGame gameInfo)
+        {
+            bool allPlayersVoted = false;
+
+            while (!allPlayersVoted)
+            {
+                // Ellenőrzés: minden játékos szavazott-e
+                allPlayersVoted = gameInfo.players.All(p => p.AlreadyVote);
+
+                // Ha még nem szavazott mindenki, várunk egy kicsit
+                if (!allPlayersVoted)
+                {
+                    await Task.Delay(5000); // 5 másodpercet várunk, majd újra ellenőrizzük
+                }
+            }
+        }
+
     }
 }

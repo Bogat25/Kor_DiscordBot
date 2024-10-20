@@ -60,7 +60,8 @@ namespace Discord_Kor.GameComponents.BotGameMessages
                                     await BotMessages.GameStartedSuccesfully(gm.gameInfo);
 
                                     gm.gameInfo.message.currentGameState = "running";
-                                    await gm.GameStarted();
+                                    return;
+                                    //await gm.GameStarted();
                                 }
                             }
                         }
