@@ -256,6 +256,16 @@ namespace Discord_Kor.GameComponents.BotGameMessages.ServerMessages
             }
         }
 
+        public static SendEvenVotes(RunningGame gameInfo, VoteResult voteResult)
+        {
+            var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
+            var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));
+
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle("A szavazatok eredménye megegyezik!")
+                .WithDescription("Kérlek szavazz újra!")
+                .WithColor(Color.Red);
+        }
 
     }
 

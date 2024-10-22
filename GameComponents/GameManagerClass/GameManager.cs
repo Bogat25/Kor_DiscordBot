@@ -55,7 +55,6 @@ namespace Discord_Kor.GameComponents.GameManagerClass
 
         public async Task GameStarted()
         {
-            // Játékosok személyiségének létrehozása
             foreach (var player in gameInfo.players)
             {
                 player.CreatePersonality();
@@ -65,6 +64,15 @@ namespace Discord_Kor.GameComponents.GameManagerClass
             await BotMessages.SendCurrentGameState(gameInfo);
             await VoteCircle();
 
+            VoteResult voteResult = CalculateVotes();
+
+            if (voteResult.votesAreEven)
+            {
+                await BotMessages.SendEvenVotes(gameInfo);
+                await VoteCircle();
+                voteResult = CalculateVotes();
+            }
+            Console.WriteLine("");
             // Szavazás kérése minden játékostól
         }
 
@@ -73,7 +81,6 @@ namespace Discord_Kor.GameComponents.GameManagerClass
             await VoteSystem.AskPeopleToVote(gameInfo);
             // Várakozás, amíg minden játékos szavaz
             await WaitForAllVotes(gameInfo);
-            Console.WriteLine("Elso szavazas megtortent");
         }
         public async Task WaitForGameStart(RunningGame gameInfo)
         {
@@ -104,6 +111,31 @@ namespace Discord_Kor.GameComponents.GameManagerClass
                     await Task.Delay(1000);
                 }
             }
+        }
+
+        public VoteResult CalculateVotes()
+        {
+            VoteResult voteResult = new VoteResult();
+            int maxReceivedVotes = 0;
+            foreach (var p in gameInfo.players)
+            {
+                if (p.ReceivedVotes > maxReceivedVotes)
+                { 
+                    maxReceivedVotes = p.ReceivedVotes;
+                }
+            }
+            foreach (var p in gameInfo.players)
+            {
+                if (p.ReceivedVotes == maxReceivedVotes)
+                {
+                    voteResult.votedPlayers.Add(p);
+                }
+            }
+            if (voteResult.votedPlayers.Count() > 1)
+            {
+                voteResult.votesAreEven = true;
+            }
+            return voteResult;
         }
 
     }
