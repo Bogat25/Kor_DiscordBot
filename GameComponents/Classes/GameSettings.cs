@@ -11,7 +11,7 @@ namespace Discord_Kor.GameComponents.Classes
         public int MaxPlayers { get; set; } = 10;
         public int MinPlayers { get; set; } = 2;
         public int VoteTime { get; set; } = 60;
-        public int DiscussionTime { get; set; } = 300;
+        public int DiscussionTime { get; set; } = 10;
 
         public override string ToString()
         {

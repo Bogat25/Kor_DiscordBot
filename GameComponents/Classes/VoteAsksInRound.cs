@@ -8,7 +8,9 @@ namespace Discord_Kor.GameComponents.Classes
 {
     public class VoteAsksInRound
     {
+        
         public string VoterId;
         public string MessageId;
+
     }
 }

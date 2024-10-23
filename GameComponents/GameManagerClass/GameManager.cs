@@ -61,7 +61,14 @@ namespace Discord_Kor.GameComponents.GameManagerClass
             }
             // Játékos adatok elküldése
             await BotMessages.SendPlayersDataSheet(gameInfo);
+            await GameRunning();
+        }
+        public async Task GameRunning()
+        {
             await BotMessages.SendCurrentGameState(gameInfo);
+            
+            await DiscusTime();
+            await WaitForVoteCircleEnd();
             await VoteCircle();
 
             VoteResult voteResult = VoteCalculator.CalculateVotes(gameInfo);
@@ -76,11 +83,7 @@ namespace Discord_Kor.GameComponents.GameManagerClass
             {
                 await BotMessages.SendVotesResult(gameInfo, voteResult);
             }
-            gameInfo.ApplieVoteResults(voteResult);
-            await BotMessages.SendCurrentGameState(gameInfo);
-            await DiscusTime();
-            await VoteCircle();
-            Console.WriteLine();
+            await GameRunning();
         }
 
         public async Task VoteCircle()
@@ -102,18 +105,37 @@ namespace Discord_Kor.GameComponents.GameManagerClass
                 await Task.Delay(1000);
             }
         }
+        public async Task WaitForVoteCircleEnd()
+        {
+            if (gameInfo.allPlayersVoted)
+            {
+                return;
+            }
+            else
+            {
+                await Task.Delay(gameInfo.settings.DiscussionTime * 1000); //azert szorzunk 1000 el hogy "mp-be valtsunk"
+                if (gameInfo.allPlayersVoted == true)
+                {
+                    return;
+                }
+                else
+                {
+                    gameInfo.allPlayersVoted = true;
+                    await VoteSystem.NotifyLateVoters(gameInfo);
+                }
+            }
+        }
 
         public async Task WaitForAllVotes(RunningGame gameInfo)
         {
-            bool allPlayersVoted = false;
 
-            while (!allPlayersVoted)
+            while (!gameInfo.allPlayersVoted)
             {
                 // Ellenőrzés: minden játékos szavazott-e
-                allPlayersVoted = gameInfo.players.All(p => p.AlreadyVote);
+                gameInfo.allPlayersVoted = gameInfo.players.All(p => p.AlreadyVote);
 
                 // Ha még nem szavazott mindenki, várunk egy kicsit
-                if (!allPlayersVoted)
+                if (!gameInfo.allPlayersVoted)
                 {
                     await Task.Delay(1000);
                 }

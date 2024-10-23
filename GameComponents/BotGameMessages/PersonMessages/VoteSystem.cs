@@ -70,6 +70,26 @@ namespace Discord_Kor.GameComponents.BotGameMessages.PersonMessages
             }
         }
 
+        public static async Task NotifyLateVoters(RunningGame gameInfo)
+        {
+            foreach (var player in gameInfo.players)
+            {
+                // Csak az élő játékosokat ellenőrizzük, akik nem szavaztak időben
+                if (player.IsAlive && !player.AlreadyVote)
+                {
+                    // Megkeressük a játékos Discord felhasználóját a Discord ID alapján
+                    var user = Program.Client.GetUser(ulong.Parse(player.Id));
+
+                    if (user != null)
+                    {
+                        // Privát üzenet küldése, amely jelzi, hogy a szavazatuk nem ér, mert nem szavaztak időben
+                        await user.SendMessageAsync("❌ Nem szavaztál időben, így a szavazatod nem ér.");
+                    }
+                }
+            }
+        }
+
+
 
         // Reakciók várása (nem blokkoló módon)
         //public static async Task<Emoji> WaitForReactionAsync(IUserMessage voteMessage, Player votingPlayer)
