@@ -36,5 +36,7 @@ namespace Discord_Kor.GameComponents.GameManagerClass
             }
             return voteResult;
         }
+
+
     }
 }

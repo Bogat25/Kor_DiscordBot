@@ -33,6 +33,15 @@ public class RunningGame
 
     public void ApplieVoteResults(VoteResult voteResult)
     {
+        Random rnd = new Random();
+        if (voteResult.votesAreEven)
+        {
+            voteResult.deadPlayerID = voteResult.votedPlayers[rnd.Next(voteResult.votedPlayers.Count)].Id;
+        }else
+        {
+            voteResult.deadPlayerID = voteResult.votedPlayers[0].Id;
+        }
+
         foreach (var player in players)
         {
             if (player.Id == voteResult.deadPlayerID)
