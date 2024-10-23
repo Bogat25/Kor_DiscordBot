@@ -15,7 +15,6 @@ using System.Diagnostics;
 
 namespace Discord_Kor.GameComponents.GameManagerClass;
 
-//Console.WriteLine("Game Manager has been Started");
 public class GameManager
 {
     public RunningGame gameInfo = new RunningGame();
@@ -68,29 +67,16 @@ public class GameManager
 
         while (true)
         {
-            int alivePlayersCount = 0;
-            foreach (var player in gameInfo.players)
-            {
-                if (player.IsAlive)
-                {
-                    alivePlayersCount++;
-                }
-            }
-            if (alivePlayersCount < 3)
-            {
-                break;
-            }
+            int alivePlayersCount = gameInfo.players.Where(p => p.IsAlive == true).Count();
+            gameInfo.allPlayersVoted = gameInfo.players.All(p => p.AlreadyVote);
+
+            //if (alivePlayersCount < 3)
+            //{
+            //    break;
+            //}
             await VoteCircle();
         }
     }
-        
-        //await BotMessages.SendCurrentGameState(gameInfo);
-        
-        //await DiscusTime();
-        //await WaitForVoteCircleEnd();
-        //VoteCalculator.CalculateVotes(gameInfo);
-
-        //await GameRunning();
 
     public async Task WaitForGameStart(RunningGame gameInfo)
     {
