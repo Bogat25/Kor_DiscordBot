@@ -70,10 +70,11 @@ public class GameManager
             int alivePlayersCount = gameInfo.players.Where(p => p.IsAlive == true).Count();
             gameInfo.allPlayersVoted = gameInfo.players.All(p => p.AlreadyVote);
 
-            //if (alivePlayersCount < 3)
-            //{
-            //    break;
-            //}
+            if (alivePlayersCount < 3)
+            {
+                await TwoManStanding();
+                break;
+            }
             await VoteCircle();
         }
     }
@@ -161,6 +162,11 @@ public class GameManager
     public async Task DiscusTime()
     {
         await BotMessages.SendDiscussionTimeStarted(gameInfo, gameInfo.settings.DiscussionTime);
+    }
+
+    public async Task TwoManStanding()
+    {
+        await BotMessages.TwoManStandingServerMessage(gameInfo);
     }
 
 

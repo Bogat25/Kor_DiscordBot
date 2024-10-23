@@ -344,6 +344,35 @@ public class BotMessages
         await channel.SendMessageAsync(embed: embedBuilder.Build());
     }
 
+    public static async Task TwoManStandingServerMessage(RunningGame gameInfo)
+    {
+        var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
+        var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));
+
+        // Az utolsó két játékos kilistázása
+        var remainingPlayers = gameInfo.players.Where(p => p.IsAlive).ToList();
+
+        if (remainingPlayers.Count == 2)
+        {
+            var player1 = remainingPlayers[0];
+            var player2 = remainingPlayers[1];
+
+            // Embed létrehozása arany színnel
+            var embed = new EmbedBuilder()
+                .WithTitle("🌟 Az utolsó két játékos állva maradt! 🌟")
+                .WithDescription($"⚔️ **{player1.Name}** és **{player2.Name}** között fog eldőlni vajon ketten becsületesen túlélik?\n" +
+                                 "Vagy netán egyiküknek meg kell hallnia?!")
+                .WithColor(Color.Gold)
+                .Build();
+
+            // Üzenet elküldése az embed használatával
+            await channel.SendMessageAsync(embed: embed);
+        }
+        else
+        {
+            await channel.SendMessageAsync("Hiba történt: Nem pontosan két játékos maradt életben.");
+        }
+    }
 
 }
 

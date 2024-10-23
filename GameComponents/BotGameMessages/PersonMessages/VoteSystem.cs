@@ -91,28 +91,7 @@ namespace Discord_Kor.GameComponents.BotGameMessages.PersonMessages
 
 
 
-        // Reakciók várása (nem blokkoló módon)
-        //public static async Task<Emoji> WaitForReactionAsync(IUserMessage voteMessage, Player votingPlayer)
-        //{
-        //    var tcs = new TaskCompletionSource<Emoji>();
-
-        //    // Eseménykezelő, ami figyeli a reakciókat
-        //    Program.Client.ReactionAdded += async (cache, channel, reaction) =>
-        //    {
-        //        if (reaction.UserId == ulong.Parse(votingPlayer.Id) && reaction.MessageId == voteMessage.Id)
-        //        {
-        //            var emoji = reaction.Emote as Emoji;
-        //            if (emoji != null)
-        //            {
-        //                tcs.SetResult(emoji);
-        //            }
-        //        }
-        //    };
-
-        //    // Várakozás a reakcióra vagy egy időkorlát
-        //    var task = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromMinutes(1)));
-        //    return task == tcs.Task ? tcs.Task.Result : null;
-        //}
+   
 
         public static async Task ManageReactionsReactionAddedUser(Cacheable<IUserMessage, ulong> cacheableMessage, Cacheable<IMessageChannel, ulong> cacheableChannel, SocketReaction reaction)
         {
