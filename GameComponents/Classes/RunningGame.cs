@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,5 +26,23 @@ public class RunningGame
         this.gameServerId = gameServerId;
         this.gameChannelId = gameChannelId;
         players.Add(gameMaster);
+    }
+
+
+
+    public void ApplieVoteResults(VoteResult voteResult)
+    {
+        foreach (var player in players)
+        {
+            if (player.Id == voteResult.deadPlayerID)
+            {
+                player.IsAlive = false;
+            }
+        }
+        foreach (var player in players )
+        {
+            player.AlreadyVote = false;
+            player.ReceivedVotes = 0;
+        }
     }
 }

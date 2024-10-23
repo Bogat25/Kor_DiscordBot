@@ -64,16 +64,23 @@ namespace Discord_Kor.GameComponents.GameManagerClass
             await BotMessages.SendCurrentGameState(gameInfo);
             await VoteCircle();
 
-            VoteResult voteResult = CalculateVotes();
+            VoteResult voteResult = VoteCalculator.CalculateVotes(gameInfo);
+
+            Console.WriteLine("");
 
             if (voteResult.votesAreEven)
             {
-                await BotMessages.SendEvenVotes(gameInfo);
-                await VoteCircle();
-                voteResult = CalculateVotes();
+                await BotMessages.SendEvenVotesResult(gameInfo, voteResult);
             }
-            Console.WriteLine("");
-            // Szavazás kérése minden játékostól
+            else
+            {
+                await BotMessages.SendVotesResult(gameInfo, voteResult);
+            }
+            gameInfo.ApplieVoteResults(voteResult);
+            await BotMessages.SendCurrentGameState(gameInfo);
+            await DiscusTime();
+            await VoteCircle();
+            Console.WriteLine();
         }
 
         public async Task VoteCircle()
@@ -113,30 +120,11 @@ namespace Discord_Kor.GameComponents.GameManagerClass
             }
         }
 
-        public VoteResult CalculateVotes()
+        public async Task DiscusTime()
         {
-            VoteResult voteResult = new VoteResult();
-            int maxReceivedVotes = 0;
-            foreach (var p in gameInfo.players)
-            {
-                if (p.ReceivedVotes > maxReceivedVotes)
-                { 
-                    maxReceivedVotes = p.ReceivedVotes;
-                }
-            }
-            foreach (var p in gameInfo.players)
-            {
-                if (p.ReceivedVotes == maxReceivedVotes)
-                {
-                    voteResult.votedPlayers.Add(p);
-                }
-            }
-            if (voteResult.votedPlayers.Count() > 1)
-            {
-                voteResult.votesAreEven = true;
-            }
-            return voteResult;
+            await BotMessages.SendDiscussionTimeStarted(gameInfo, gameInfo.settings.DiscussionTime);
         }
+
 
     }
 }

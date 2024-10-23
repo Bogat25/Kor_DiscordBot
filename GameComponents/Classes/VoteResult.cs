@@ -10,6 +10,7 @@ namespace Discord_Kor.GameComponents.Classes
     {
         public bool votesAreEven = false;
         public List<Player> votedPlayers = new List<Player>();
+        public string deadPlayerID = string.Empty;
         
     }
 }

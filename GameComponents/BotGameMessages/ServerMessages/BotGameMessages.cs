@@ -255,16 +255,95 @@ public class BotMessages
         }
     }
 
-    public static SendEvenVotes(RunningGame gameInfo, VoteResult voteResult)
+    public static async Task SendEvenVotesResult(RunningGame gameInfo, VoteResult voteResult)
     {
         var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
         var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));
 
-        var embedBuilder = new EmbedBuilder()
-            .WithTitle("A szavazatok eredménye megegyezik!")
-            .WithDescription("Kérlek szavazz újra!")
-            .WithColor(Color.Red);
+        Player? deadPlayer = gameInfo.players.FirstOrDefault(p => p.Id == voteResult.deadPlayerID);
+        if (deadPlayer == null) return;
+
+        // Embed létrehozása
+        var embed = new EmbedBuilder()
+            .WithTitle("A szavazás végeredménye")
+            .WithColor(Color.Red)  // Piros keret
+            .WithDescription("Mivel a szavazatok egyenlőek voltak, véletlenszerűen választottuk ki hogy ki fog meghallni.")
+            .AddField("Kiesett játékos:", $":skull: **{deadPlayer.Name}** :skull:", true)
+            .WithFooter(footer => footer.Text = "A játék folytatódik...")  // Tetszőleges lábléc
+            .WithTimestamp(DateTimeOffset.Now);  // Időbélyeg az üzenethez
+
+        // Üzenet küldése a beágyazott tartalommal
+        await channel.SendMessageAsync(embed: embed.Build());
     }
+
+    public static async Task SendVotesResult(RunningGame gameInfo, VoteResult voteResult)
+    {
+        var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
+        var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));
+
+        // Ellenőrizzük, hogy van-e kiesett játékos
+        Player? deadPlayer = gameInfo.players.FirstOrDefault(p => p.Id == voteResult.deadPlayerID);
+
+        // Ha nincs kiesett játékos, akkor visszatérünk
+        if (deadPlayer == null) return;
+
+        // Embed létrehozása
+        var embed = new EmbedBuilder()
+            .WithTitle("A szavazás végeredménye")
+            .WithColor(Color.Red)  // Piros keret
+            .WithDescription("A szavazás eredménye alapján az alábbi játékos esett ki.")
+            .AddField("Kiesett játékos:", $":skull: **{deadPlayer.Name}** :skull:", true)
+            .WithFooter(footer => footer.Text = "A játék folytatódik...")  // Tetszőleges lábléc
+            .WithTimestamp(DateTimeOffset.Now);  // Időbélyeg az üzenethez
+
+        // Üzenet küldése a beágyazott tartalommal
+        await channel.SendMessageAsync(embed: embed.Build());
+    }
+
+    public static async Task SendDiscussionTimeStarted(RunningGame runningGame, int remainingTimeInSeconds)
+    {
+        // Az embed üzenet létrehozása
+        var embedBuilder = new EmbedBuilder()
+            .WithTitle("🕒 Beszélgetési Időszak")
+            .WithColor(Color.Orange)  // Narancssárga szín a kiemeléshez
+            .WithDescription($"A játékosoknak **{remainingTimeInSeconds} másodperc** van hátra, hogy megbeszéljék a dolgokat a szavazás előtt.");
+
+        // Élő játékosok listája
+        StringBuilder livePlayersList = new StringBuilder();
+        StringBuilder eliminatedPlayersList = new StringBuilder();
+
+        int playerIndex = 1; // Játékosok sorszáma
+
+        // Végigmegyünk a játékosokon és összeállítjuk az élő és kiesett játékosok listáját
+        foreach (var player in runningGame.players)
+        {
+            if (player.IsAlive)
+            {
+                // Élő játékosok félkövér stílusban és sorszámozva
+                livePlayersList.Append($"**{playerIndex}. {player.Name}**\n");
+            }
+            else
+            {
+                // Kiesett játékosok áthúzott stílusban és sorszámozva
+                eliminatedPlayersList.Append($"~~{playerIndex}. {player.Name}~~\n");
+            }
+            playerIndex++;
+        }
+
+        // Élő játékosok hozzáadása az embedhez
+        embedBuilder.AddField("✅ Élő Játékosok:", livePlayersList.Length > 0 ? livePlayersList.ToString() : "Nincsenek élő játékosok", false);
+
+        // Kiesett játékosok hozzáadása az embedhez
+        embedBuilder.AddField("💀 Kiesett Játékosok:", eliminatedPlayersList.Length > 0 ? eliminatedPlayersList.ToString() : "Nincsenek kiesett játékosok", false);
+
+        // Megkeressük a Discord guildet és a csatornát
+        var guild = Program.Client.GetGuild(ulong.Parse(runningGame.gameServerId));
+        var channel = guild.GetTextChannel(ulong.Parse(runningGame.gameChannelId));
+
+        // Üzenet küldése a beágyazott tartalommal
+        await channel.SendMessageAsync(embed: embedBuilder.Build());
+    }
+
 
 }
 
