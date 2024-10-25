@@ -71,11 +71,13 @@ public class GameManager
 
             if (alivePlayersCount < 3)
             {
-                await TwoManStanding();
+                await AskTwoManStanding();
+                
                 break;
             }
             await VoteCircle();
         }
+        await CalculateTheWinner();
     }
 
     public async Task WaitForGameStart(RunningGame gameInfo)
@@ -163,7 +165,7 @@ public class GameManager
         await BotMessages.SendDiscussionTimeStarted(gameInfo, gameInfo.settings.DiscussionTime);
     }
 
-    public async Task TwoManStanding()
+    public async Task AskTwoManStanding()
     {
 
         await BotMessages.SendTwoManStandingServerMessage(gameInfo);
@@ -189,6 +191,25 @@ public class GameManager
                 }
                 return;
             }
+        }
+    }
+    public async Task CalculateTheWinner()
+    {
+        List<Player> lastTwo = gameInfo.players.Where(p => p.IsAlive == true).ToList();
+
+        if (lastTwo.Count(l => l.isCooperating == true) == 2)
+        {
+            await BotMessages.SendTheTwoWinner(gameInfo.gameServerId, gameInfo.gameChannelId, lastTwo);
+        }
+        else if (lastTwo.Count(l => l.isCooperating == true) == 1)
+        {
+            await BotMessages.SendTheOneWinner(lastTwo);
+
+        }
+        else if (lastTwo.Count(l => l.isCooperating == true) == 0)
+        {
+            await BotMessages.SendNoWinner(lastTwo);
+
         }
     }
 }

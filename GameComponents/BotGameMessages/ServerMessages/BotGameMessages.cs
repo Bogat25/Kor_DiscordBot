@@ -373,6 +373,34 @@ public class BotMessages
             await channel.SendMessageAsync("Hiba történt: Nem pontosan két játékos maradt életben.");
         }
     }
+    public static async Task SendTheTwoWinner(string serverID, string channelID, List<Player> lastPlayers)
+    {
+        var channel = Program.Client.GetChannel(ulong.Parse(channelID)) as IMessageChannel;
+
+        if (channel != null && lastPlayers.Count == 2)
+        {
+            var player1 = lastPlayers[0];
+            var player2 = lastPlayers[1];
+
+            string message = $"🎉🎉 Gratulálunk, {player1.Name} és {player2.Name}! 🎉🎉\n\n" +
+                             $"A bátorságotok és az együttműködésetek meghozta a gyümölcsét! 👏 " +
+                             $"Mivel közösen döntöttetek a barátság és a bizalom mellett, mindketten " +
+                             $"nyertesként és túlélőként távoztok a játékból! 🏆🤝\n\n" +
+                             $"Ez a nap most csak rólatok szól - élvezzétek a győzelem édes ízét, " +
+                             $"hiszen megmutattátok, hogy a valódi erő az összefogásban rejlik. 💪🌟";
+
+            await channel.SendMessageAsync(message);
+        }
+    }
+
+    public static async Task SendTheOneWinner(List<Player> lastPlayers)
+    {
+
+    }
+    public static async Task SendNoWinner(List<Player> lastPlayers)
+    {
+
+    }
 
 }
 
