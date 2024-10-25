@@ -153,9 +153,35 @@ public static class VoteSystem
                                 if (user != null)
                                 {
                                     await user.SendMessageAsync($"Sikeresen szavaztál {votedPlayer.Name}-ra!");
-                                    Console.WriteLine("test");
                                 }
                             }
+                        }
+                    }
+                }
+            }
+            else if (gm.gameInfo.players.Count(p => p.IsAlive = true) == 2)
+            {
+                var cooperatePlayer = gm.gameInfo.players.FirstOrDefault(p => p.Id == reaction.UserId.ToString());
+
+                var message = await cacheableMessage.GetOrDownloadAsync();
+                var channel = await cacheableChannel.GetOrDownloadAsync();
+
+                if (message != null && channel != null)
+                {
+                    Emoji? emoji = reaction.Emote as Emoji;
+
+                    if (emoji != null)
+                    {
+                        SocketUser user = Program.Client.GetUser(ulong.Parse(cooperatePlayer.Id));
+                        
+                        if (emoji.Name == ReactionTypes.cooperateEmoji.Name)
+                        {
+
+                            await user.SendMessageAsync($"Úgy döntöttél a barátságra és a megosztozásra voksoltál! {emoji}");
+                        }
+                        else if (emoji.Name == ReactionTypes.notCooperateEmoji.Name)
+                        {
+                            await user.SendMessageAsync($"Úgy döntöttél az árulásra és a győzelemre voksoltál! {emoji}");
                         }
                     }
                 }
