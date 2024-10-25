@@ -344,7 +344,7 @@ public class BotMessages
         await channel.SendMessageAsync(embed: embedBuilder.Build());
     }
 
-    public static async Task TwoManStandingServerMessage(RunningGame gameInfo)
+    public static async Task SendTwoManStandingServerMessage(RunningGame gameInfo)
     {
         var guild = Program.Client.GetGuild(ulong.Parse(gameInfo.gameServerId));
         var channel = guild.GetTextChannel(ulong.Parse(gameInfo.gameChannelId));

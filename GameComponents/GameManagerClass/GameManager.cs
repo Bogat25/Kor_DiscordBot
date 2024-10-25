@@ -165,9 +165,30 @@ public class GameManager
 
     public async Task TwoManStanding()
     {
-        await BotMessages.TwoManStandingServerMessage(gameInfo);
+
+        await BotMessages.SendTwoManStandingServerMessage(gameInfo);
         await VoteSystem.AskPlayersToDecide(gameInfo);
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        while (true)
+        {
+            if (gameInfo.players.Count(p => p.isCooperating != null) == 2)
+            {
+                return;
+            }
+            else if(stopwatch.Elapsed.TotalSeconds >= gameInfo.settings.DecideToCooperate * 1000)
+            {
+                foreach (var p in gameInfo.players)
+                {
+                    if (p.isCooperating == null)
+                    {
+                        await VoteSystem.NotifyLateCooperators(gameInfo);
+                        p.isCooperating = true;
+                    }
+                }
+                return;
+            }
+        }
     }
-
-
 }

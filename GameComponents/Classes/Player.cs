@@ -16,6 +16,7 @@ namespace Discord_Kor.GameComponents.Classes
         public bool IsAlive { get; set; } = true;
         public bool AlreadyVote { get; set; } = false;
         public int ReceivedVotes { get; set; } = 0;
+        public bool? isCooperating;
 
         // Constructors
         public Player() { }

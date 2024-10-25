@@ -12,6 +12,7 @@ namespace Discord_Kor.GameComponents.Classes
         public int MinPlayers { get; set; } = 2;
         public int VoteTime { get; set; } = 60;
         public int DiscussionTime { get; set; } = 120;
+        public int DecideToCooperate { get; set; } = 60;
 
         public override string ToString()
         {
@@ -19,7 +20,8 @@ namespace Discord_Kor.GameComponents.Classes
             Max Játékosok: {MaxPlayers}
             Min Játékosok: {MinPlayers}
             Szavazási idő (másodperc): {VoteTime}
-            Vita időtartam (másodperc): {DiscussionTime}";
+            Vita időtartam (másodperc): {DiscussionTime}
+            Végső döntés (másodperc): {DecideToCooperate}";
         }
     }
 

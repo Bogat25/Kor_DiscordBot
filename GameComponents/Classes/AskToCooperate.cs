@@ -8,8 +8,8 @@ namespace Discord_Kor.GameComponents.Classes
 {
     public class AskToCooperate
     {
-        string userID;
-        string messageID;
+        public string userID;
+        public string messageID;
 
         public AskToCooperate(string userID, string messageID)
         {

@@ -27,8 +27,8 @@ namespace Discord_Kor.GameComponents.Classes
         public static readonly Emoji nineEmoji = new Emoji("9️⃣");
         public static readonly Emoji tenEmoji = new Emoji("🔟");
 
-        public static readonly Emoji cooperateEmoji = new Emoji("⚔️");
-        public static readonly Emoji notCooperateEmoji = new Emoji("🛡️");
+        public static readonly Emoji cooperateEmoji = new Emoji("🛡️");
+        public static readonly Emoji notCooperateEmoji = new Emoji("⚔️");
     }
     
 }

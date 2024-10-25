@@ -88,6 +88,21 @@ public static class VoteSystem
             }
         }
     }
+    public static async Task NotifyLateCooperators(RunningGame gameInfo)
+    {
+        foreach (var player in gameInfo.players)
+        {
+            if (player.isCooperating == null && player.IsAlive)
+            {
+                var user = Program.Client.GetUser(ulong.Parse(player.Id));
+
+                if (user != null)
+                {
+                    await user.SendMessageAsync("Nem vállasztottál hogy együtt működsz e így automatikusan együtt működtél.");
+                }
+            }
+        }
+    }
 
 
 
@@ -159,37 +174,47 @@ public static class VoteSystem
                     }
                 }
             }
-            else if (gm.gameInfo.players.Count(p => p.IsAlive = true) == 2)
+            else if (gm.gameInfo.players.Count(p => p.IsAlive == true) == 2)
             {
-                var cooperatePlayer = gm.gameInfo.players.FirstOrDefault(p => p.Id == reaction.UserId.ToString());
-
                 var message = await cacheableMessage.GetOrDownloadAsync();
                 var channel = await cacheableChannel.GetOrDownloadAsync();
+                if (message == null || channel == null) return;
 
-                if (message != null && channel != null)
+                foreach (var p in gm.gameInfo.players)
                 {
-                    Emoji? emoji = reaction.Emote as Emoji;
+                    var cooperatePlayer = gm.gameInfo.players.FirstOrDefault(pl => pl.Id == reaction.UserId.ToString());
 
-                    if (emoji != null)
+                    if (cooperatePlayer == null) continue; // Ellenőrizzük, hogy megtaláltuk-e a játékost
+
+                    foreach (var coop in gm.gameInfo.askToCooperate)
                     {
-                        SocketUser user = Program.Client.GetUser(ulong.Parse(cooperatePlayer.Id));
-                        
-                        if (emoji.Name == ReactionTypes.cooperateEmoji.Name)
+                        if (p.Id == coop.userID && message.Id.ToString() == coop.messageID)
                         {
+                            Emoji? emoji = reaction.Emote as Emoji;
 
-                            await user.SendMessageAsync($"Úgy döntöttél a barátságra és a megosztozásra voksoltál! {emoji}");
-                        }
-                        else if (emoji.Name == ReactionTypes.notCooperateEmoji.Name)
-                        {
-                            await user.SendMessageAsync($"Úgy döntöttél az árulásra és a győzelemre voksoltál! {emoji}");
+                            if (emoji != null)
+                            {
+                                SocketUser user = Program.Client.GetUser(ulong.Parse(cooperatePlayer.Id));
+
+                                if (emoji.Name == ReactionTypes.cooperateEmoji.Name)
+                                {
+                                    await user.SendMessageAsync($"Úgy döntöttél a barátságra és a megosztozásra voksoltál! {emoji}");
+                                    p.isCooperating = true;
+                                }
+                                else if (emoji.Name == ReactionTypes.notCooperateEmoji.Name)
+                                {
+                                    await user.SendMessageAsync($"Úgy döntöttél az árulásra és a győzelemre voksoltál! {emoji}");
+                                    p.isCooperating = false;
+                                }
+                            }
                         }
                     }
                 }
             }
-
         }
     }
-    public static async Task AskPlayersToDecide(RunningGame gameInfo)
+
+        public static async Task AskPlayersToDecide(RunningGame gameInfo)
     {
         foreach (var player in gameInfo.players)
         {
