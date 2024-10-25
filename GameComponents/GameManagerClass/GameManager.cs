@@ -64,7 +64,6 @@ public class GameManager
     }
     public async Task GameRunning()
     {
-
         while (true)
         {
             int alivePlayersCount = gameInfo.players.Where(p => p.IsAlive == true).Count();
@@ -167,6 +166,7 @@ public class GameManager
     public async Task TwoManStanding()
     {
         await BotMessages.TwoManStandingServerMessage(gameInfo);
+        await VoteSystem.AskPlayersToDecide(gameInfo);
     }
 
 

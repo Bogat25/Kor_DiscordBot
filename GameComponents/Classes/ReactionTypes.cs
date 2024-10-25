@@ -9,23 +9,26 @@ namespace Discord_Kor.GameComponents.Classes
 {
     public static class ReactionTypes
     {
-        public static Emoji greenCheckEmoji = new Emoji("✅");
-        public static Emoji startEmoji = new Emoji("▶️");
-        public static Emoji xEmoji = new Emoji("❌");
-        public static Emoji blankEmoji = new Emoji("⬜");
+        public static readonly Emoji greenCheckEmoji = new Emoji("✅");
+        public static readonly Emoji startEmoji = new Emoji("▶️");
+        public static readonly Emoji xEmoji = new Emoji("❌");
+        public static readonly Emoji blankEmoji = new Emoji("⬜");
 
         // 0-tól 10-ig szám emojik
-        public static Emoji zeroEmoji = new Emoji("0️⃣");
-        public static Emoji oneEmoji = new Emoji("1️⃣");
-        public static Emoji twoEmoji = new Emoji("2️⃣");
-        public static Emoji threeEmoji = new Emoji("3️⃣");
-        public static Emoji fourEmoji = new Emoji("4️⃣");
-        public static Emoji fiveEmoji = new Emoji("5️⃣");
-        public static Emoji sixEmoji = new Emoji("6️⃣");
-        public static Emoji sevenEmoji = new Emoji("7️⃣");
-        public static Emoji eightEmoji = new Emoji("8️⃣");
-        public static Emoji nineEmoji = new Emoji("9️⃣");
-        public static Emoji tenEmoji = new Emoji("🔟");
-    }
+        public static readonly Emoji zeroEmoji = new Emoji("0️⃣");
+        public static readonly Emoji oneEmoji = new Emoji("1️⃣");
+        public static readonly Emoji twoEmoji = new Emoji("2️⃣");
+        public static readonly Emoji threeEmoji = new Emoji("3️⃣");
+        public static readonly Emoji fourEmoji = new Emoji("4️⃣");
+        public static readonly Emoji fiveEmoji = new Emoji("5️⃣");
+        public static readonly Emoji sixEmoji = new Emoji("6️⃣");
+        public static readonly Emoji sevenEmoji = new Emoji("7️⃣");
+        public static readonly Emoji eightEmoji = new Emoji("8️⃣");
+        public static readonly Emoji nineEmoji = new Emoji("9️⃣");
+        public static readonly Emoji tenEmoji = new Emoji("🔟");
 
+        public static readonly Emoji cooperateEmoji = new Emoji("⚔️");
+        public static readonly Emoji notCooperateEmoji = new Emoji("🛡️");
+    }
+    
 }

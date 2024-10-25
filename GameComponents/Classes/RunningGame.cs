@@ -17,6 +17,7 @@ public class RunningGame
     public List<Player> players = new List<Player>();
     public GameSettings settings = new GameSettings();
     public List<VoteAsksInRound >voteAsks = new List<VoteAsksInRound>();
+    public List<AskToCooperate> askToCooperate = new List<AskToCooperate>();
     public bool allPlayersVoted = false;
     public RunningGame()
     {
