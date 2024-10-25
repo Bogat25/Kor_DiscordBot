@@ -78,6 +78,8 @@ public class GameManager
             await VoteCircle();
         }
         await CalculateTheWinner();
+        await BotMessages.SendGameEndedAndResult(gameInfo);
+        Console.WriteLine("");
     }
 
     public async Task WaitForGameStart(RunningGame gameInfo)
@@ -199,16 +201,38 @@ public class GameManager
 
         if (lastTwo.Count(l => l.isCooperating == true) == 2)
         {
-            await BotMessages.SendTheTwoWinner(gameInfo.gameServerId, gameInfo.gameChannelId, lastTwo);
+            await BotMessages.SendTheTwoWinner(gameInfo.gameChannelId, lastTwo);
         }
         else if (lastTwo.Count(l => l.isCooperating == true) == 1)
         {
-            await BotMessages.SendTheOneWinner(lastTwo);
-
+            foreach (var l in lastTwo)
+            {
+                if (l.isCooperating == true)
+                {
+                    l.IsAlive = false;
+                    break;
+                }
+            }
+            foreach (var player in gameInfo.players)
+            {
+                foreach(var lp in lastTwo)
+                {
+                    if (player.Id == lp.Id)
+                    {
+                        player.IsAlive = lp.IsAlive;
+                    }
+                }
+            }
+            await BotMessages.SendTheOneWinner(gameInfo.gameChannelId,lastTwo);
         }
         else if (lastTwo.Count(l => l.isCooperating == true) == 0)
         {
-            await BotMessages.SendNoWinner(lastTwo);
+            foreach (var l in lastTwo)
+            {
+                l.IsAlive = false;
+            }
+            gameInfo.players.ForEach(p => p.IsAlive = false);
+            await BotMessages.SendNoWinner(gameInfo.gameChannelId, lastTwo);
 
         }
     }

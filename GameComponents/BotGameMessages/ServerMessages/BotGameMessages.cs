@@ -373,7 +373,7 @@ public class BotMessages
             await channel.SendMessageAsync("Hiba történt: Nem pontosan két játékos maradt életben.");
         }
     }
-    public static async Task SendTheTwoWinner(string serverID, string channelID, List<Player> lastPlayers)
+    public static async Task SendTheTwoWinner(string channelID, List<Player> lastPlayers)
     {
         var channel = Program.Client.GetChannel(ulong.Parse(channelID)) as IMessageChannel;
 
@@ -393,13 +393,111 @@ public class BotMessages
         }
     }
 
-    public static async Task SendTheOneWinner(List<Player> lastPlayers)
+    public static async Task SendTheOneWinner(string channelID, List<Player> lastPlayers)
     {
+        var channel = Program.Client.GetChannel(ulong.Parse(channelID)) as IMessageChannel;
 
+        if (channel != null && lastPlayers.Count == 2)
+        {
+            var winner = lastPlayers.FirstOrDefault(p => p.IsAlive);
+            var loser = lastPlayers.FirstOrDefault(p => !p.IsAlive);
+
+            if (winner != null && loser != null)
+            {
+                string message = $"💀 A játék véget ért... és csak egy maradhatott! 💀\n\n" +
+                                 $"🥇 Gratulálunk, {winner.Name}! Te lettél a győztes, de nem akárhogy... 👑\n\n" +
+                                 $"{loser.Name} bízott benned és az együttműködést választotta 🤝, de te az árulás mellett döntöttél, " +
+                                 $"így a győzelmet egyedül szerezted meg. Ez a küzdelem végül a te hidegvéred és stratégiai döntésed révén dőlt el.\n\n" +
+                                 $"Emlékezz: ebben a játékban a bizalom néha halálos lehet! 🔪";
+
+                await channel.SendMessageAsync(message);
+            }
+        }
     }
-    public static async Task SendNoWinner(List<Player> lastPlayers)
-    {
 
+    public static async Task SendNoWinner(string channelID, List<Player> lastPlayers)
+    {
+        var channel = Program.Client.GetChannel(ulong.Parse(channelID)) as IMessageChannel;
+
+        if (channel != null && lastPlayers.Count == 2 && lastPlayers.All(p => !p.IsAlive))
+        {
+            Player player1 = lastPlayers[0];
+            Player player2 = lastPlayers[1];
+
+            string message = $"💀 Senki sem maradt életben! 💀\n\n" +
+                             $"{player1.Name} és {player2.Name} mindketten úgy döntöttek, hogy az árulás útját választják, " +
+                             $"de ennek következményeként mindketten elbuktak. A küzdelem véget ért, és nem maradt nyertes.\n\n" +
+                             $"Ez a játék emlékeztet arra, hogy néha a bizalom és az együttműködés a kulcs a túléléshez, " +
+                             $"de sajnos most mindkét fél az önös érdekeket választotta. Az árulásnak megvolt az ára... 😔";
+
+            await channel.SendMessageAsync(message);
+        }
+    }
+
+    public static async Task SendGameEndedAndResult(RunningGame gameInfo)
+    {
+        var channel = Program.Client.GetChannel(ulong.Parse(gameInfo.gameChannelId)) as IMessageChannel;
+
+        if (channel != null)
+        {
+            var alivePlayers = gameInfo.players.Where(p => p.IsAlive).ToList();
+            var deadPlayers = gameInfo.players.Where(p => !p.IsAlive).ToList();
+
+            // EmbedBuilder létrehozása
+            EmbedBuilder embedBuilder = new EmbedBuilder()
+                .WithTitle("🎲 A játék véget ért! 🎲")
+                .WithColor(new Color(0, 255, 0)); // Zöld szín
+
+            // Nyertesek (élő játékosok)
+            if (alivePlayers.Count == 2)
+            {
+                embedBuilder.WithDescription("Ketten nyertek, mivel együttműködtek! 🎉");
+
+                foreach (var player in alivePlayers)
+                {
+                    embedBuilder.AddField($"{player.Name}", player.ToString(), true);
+                }
+            }
+            else if (alivePlayers.Count == 1)
+            {
+                var winner = alivePlayers.First();
+                embedBuilder.WithDescription($"Gratulálunk {winner.Name}-nak/nek, ő maradt életben! 🏆")
+                            .AddField($"{winner.Name}", winner.ToString(), true);
+            }
+            else
+            {
+                embedBuilder.WithDescription("Nincs győztes, minden játékos elbukott. 💀")
+                            .WithColor(new Color(255, 0, 0)); // Piros szín a vesztesek esetén
+            }
+
+            // Minden résztvevő kiírása
+            if (gameInfo.players.Count > 0)
+            {
+                embedBuilder.AddField("📋 Résztvevők összesítése:", "\u200B"); // Üres karakter
+            }
+
+            // Élők kiírása sárga színnel
+            if (alivePlayers.Count > 0)
+            {
+                embedBuilder.AddField("🟡 Életben maradt játékosok:", "\u200B");
+                foreach (var player in alivePlayers)
+                {
+                    embedBuilder.AddField(player.Name, player.ToString(), true);
+                }
+            }
+
+            // Elhunytak kiírása piros színnel
+            if (deadPlayers.Count > 0)
+            {
+                embedBuilder.AddField("🔴 Elhunyt játékosok:", "\u200B");
+                foreach (var player in deadPlayers)
+                {
+                    embedBuilder.AddField(player.Name, player.ToString(), true);
+                }
+            }
+
+            await channel.SendMessageAsync(embed: embedBuilder.Build());
+        }
     }
 
 }

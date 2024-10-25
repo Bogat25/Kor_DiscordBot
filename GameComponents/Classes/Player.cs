@@ -64,7 +64,6 @@ namespace Discord_Kor.GameComponents.Classes
                 **Politikai nézet:** {PoliticalView}
                 **Kinézet:** {Appearance}/10
                 **Státusz:** {status}
-                **Kapott szavazatok:** {ReceivedVotes}
                 ";
         }
 
