@@ -1,0 +1,8 @@
+services:
+  discord-kor:
+    build: .
+    container_name: discord-kor
+    environment:
+      - shards=1
+      - TOKEN=${TOKEN}
+    restart: unless-stopped
